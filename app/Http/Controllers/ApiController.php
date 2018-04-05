@@ -25,8 +25,7 @@ class ApiController extends Controller
         $validator = Validator::make($data, [
             'api_key' => 'required',
             'issue_key' => 'required',
-            'zoom_user_id' => 'required',
-            'meeting_time' => 'required',
+            'zoom_user_email' => 'required',
             'topic' => 'required',
             'agenda' => 'required'
 
@@ -40,11 +39,7 @@ class ApiController extends Controller
         if (!empty($validKey) && $apiKey === $validKey) {
 
             $issueKey = $data['issue_key'];
-            $meetingTimeZone = config('app.local_timezone');
-            $zoomUserId = $data['zoom_user_id'];
-            Log::debug('Input time: ' . $data['meeting_time']);
-            $meetingTime = Carbon::createFromFormat('n/j/y g:i A', $data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
-            Log::debug('Formed meeting time: ' . $meetingTime);
+            $zoomUserEmail = $data['zoom_user_email'];
             $topic = $data['topic'];
             $agenda = $data['agenda'];
 
@@ -56,13 +51,11 @@ class ApiController extends Controller
                 ]
             ]);
 
-            $zoomResponse = $zoomClient->post('/v2/users/' . $zoomUserId . '/meetings', [
+            $zoomResponse = $zoomClient->post('/v2/users/' . $zoomUserEmail . '/meetings', [
                 RequestOptions::JSON => [
                     'topic' => $topic,
                     'agenda' => $agenda,
-                    'type' => 2, //Scheduled Meeting
-                    'start_time' => $meetingTime,
-                    'timezone' => $meetingTimeZone
+                    'type' => 1,
                 ]
             ]);
 
@@ -73,29 +66,20 @@ class ApiController extends Controller
 
                 $jiraClient = new Client([
                     'base_uri' => config('services.jira.api'),
+                    'http_errors' => false,
                     'auth' => [
                         config('services.jira.username'),
                         config('services.jira.password')
                     ]
                 ]);
 
-                $result1 = $jiraClient->put('/issue/' . $issueKey, [
-                    RequestOptions::JSON => [
-                        "update" => [
-                            "fields" => [
-                                "resource" => $meetingURL
-                            ]
-                        ]
-                    ]
-                ]);
-
-                $result2 = $jiraClient->put('/issue/' . $issueKey . '/comment', [
+                $jiraResult = $jiraClient->put('/issue/' . $issueKey . '/comment', [
                     RequestOptions::JSON => [
                         "body" => 'Your Zoom meeting URL is: ' . $meetingURL
                     ]
                 ]);
 
-                return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequests' => [$result1, $result2]]);
+                return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequests' => $jiraResult]);
 
             } else {
                 Log::error(strval($zoomResponse->getStatusCode()) . ' ' . $zoomResponse->getReasonPhrase(), [$zoomResponse->getBody()->getContents()]);
