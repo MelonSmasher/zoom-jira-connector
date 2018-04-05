@@ -41,9 +41,7 @@ return [
     ],
 
     'jira' => [
-        'username' => env('JIRA_USERNAME'),
-        'password' => env('JIRA_PASSWORD'),
-        'api_url' => env('JIRA_API_URL')
+        'hook_url' => env('JIRA_AUTOMATE_HOOK_URL')
     ]
 
 ];

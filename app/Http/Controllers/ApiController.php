@@ -68,19 +68,17 @@ class ApiController extends Controller
                     'http_errors' => false
                 ]);
 
-                $jiraResult = $jiraClient->put(config('services.jira.api_url') . '/rest/api/2/issue/' . urlencode($issueKey) . '/comment/', [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Basic ' . base64_encode(config('services.jira.username') . ':' . config('services.jira.password'))
-                    ],
+                $jiraResult = $jiraClient->put(config('services.jira.hook_url'), [
                     RequestOptions::JSON => [
-                        'body' => 'Your Zoom meeting URL is: ' . $meetingURL
+                        'issues' => [
+                            $issueKey
+                        ],
+                        'meeting_url' => $meetingURL,
+                        'comment_body' => 'Your Zoom meeting URL is: ' . $meetingURL
                     ]
                 ]);
 
-                Log::debug('JiraResult ' . $jiraResult->getStatusCode(), [$jiraResult->getBody()->getContents()]);
-
-                return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequests' => $jiraResult]);
+                return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequest' => $jiraResult]);
 
             } else {
                 Log::error(strval($zoomResponse->getStatusCode()) . ' ' . $zoomResponse->getReasonPhrase(), [$zoomResponse->getBody()->getContents()]);
