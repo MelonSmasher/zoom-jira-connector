@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Carbon\Carbon;
+use GuzzleHttp\RequestOptions;
 
 
 class ApiController extends Controller
@@ -42,7 +43,7 @@ class ApiController extends Controller
             $meetingTimeZone = config('app.local_timezone');
             $zoomUserId = $data['zoom_user_id'];
             Log::debug('Input time: ' . $data['meeting_time']);
-            $meetingTime = Carbon::createFromFormat('n/j/y g:i A',$data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
+            $meetingTime = Carbon::createFromFormat('n/j/y g:i A', $data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
             Log::debug('Formed meeting time: ' . $meetingTime);
             $topic = $data['topic'];
             $agenda = $data['agenda'];
@@ -55,20 +56,15 @@ class ApiController extends Controller
                 ]
             ]);
 
-            try {
-                $zoomResponse = $zoomClient->request('POST', '/v2/users/' . $zoomUserId . '/meetings', [
-                    'form_params' => [
-                        'topic' => $topic,
-                        'agenda' => $agenda,
-                        'type' => 2, //Scheduled Meeting
-                        'start_time' => $meetingTime,
-                        'timezone' => $meetingTimeZone
-                    ]
-                ]);
-            } catch (GuzzleException $exception) {
-                Log::error($exception->getMessage(), [$exception->getCode(), $exception->getTrace()]);
-                abort($exception->getCode(), $exception->getMessage());
-            }
+            $zoomResponse = $zoomClient->post('/v2/users/' . $zoomUserId . '/meetings', [
+                RequestOptions::JSON => [
+                    'topic' => $topic,
+                    'agenda' => $agenda,
+                    'type' => 2, //Scheduled Meeting
+                    'start_time' => $meetingTime,
+                    'timezone' => $meetingTimeZone
+                ]
+            ]);
 
             if ($zoomResponse->getStatusCode() === 201) {
                 $result = json_decode($zoomResponse->getBody()->getContents(), true);
@@ -84,7 +80,7 @@ class ApiController extends Controller
                 ]);
 
                 $result1 = $jiraClient->put('/issue/' . $issueKey, [
-                    'body' => [
+                    RequestOptions::JSON => [
                         "update" => [
                             "fields" => [
                                 "resource" => $meetingURL
@@ -94,7 +90,7 @@ class ApiController extends Controller
                 ]);
 
                 $result2 = $jiraClient->put('/issue/' . $issueKey . '/comment', [
-                    'body' => [
+                    RequestOptions::JSON => [
                         "body" => 'Your Zoom meeting URL is: ' . $meetingURL
                     ]
                 ]);
