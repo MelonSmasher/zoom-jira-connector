@@ -68,7 +68,7 @@ class ApiController extends Controller
                     'http_errors' => false
                 ]);
 
-                $jiraResult = $jiraClient->put(config('services.jira.hook_url'), [
+                $jiraResult = $jiraClient->post(config('services.jira.hook_url'), [
                     RequestOptions::JSON => [
                         'issues' => [
                             $issueKey
