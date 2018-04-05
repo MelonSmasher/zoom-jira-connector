@@ -74,7 +74,6 @@ class ApiController extends Controller
                             $issueKey
                         ],
                         'meeting_url' => $meetingURL,
-                        'comment_body' => 'Your Zoom meeting URL is: ' . $meetingURL
                     ]
                 ]);
 
