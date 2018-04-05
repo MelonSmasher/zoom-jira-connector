@@ -70,7 +70,7 @@ class ApiController extends Controller
 
                 $credentials = base64_encode(config('services.jira.username') . ':' . config('services.jira.password'));
 
-                $jiraResult = $jiraClient->put(config('services.jira.api') . '/rest/api/2/issue/' . urlencode($issueKey) . '/comment/', [
+                $jiraResult = $jiraClient->put(config('services.jira.api_url') . '/rest/api/2/issue/' . urlencode($issueKey) . '/comment/', [
                     'headers' => [
                         'Authorization' => 'Basic ' . $credentials,
                     ],
