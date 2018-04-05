@@ -49,6 +49,7 @@ class ApiController extends Controller
 
             $zoomClient = new Client([
                 'base_uri' => $this->zoomBaseUrl,
+                'http_errors' => false,
                 'headers' => [
                     'Authorization' => 'Bearer ' . generateZoomJWT()
                 ]
