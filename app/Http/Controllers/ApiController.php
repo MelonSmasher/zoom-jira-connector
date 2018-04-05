@@ -67,19 +67,20 @@ class ApiController extends Controller
                 $jiraClient = new Client([
                     'base_uri' => config('services.jira.api'),
                     'http_errors' => false,
+                    'verify' => false,
                     'auth' => [
                         config('services.jira.username'),
                         config('services.jira.password')
                     ]
                 ]);
 
-                $jiraResult = $jiraClient->put('/issue/' . $issueKey . '/comment', [
+                $jiraResult = $jiraClient->put('/issue/' . $issueKey . '/comment/', [
                     RequestOptions::JSON => [
-                        "body" => 'Your Zoom meeting URL is: ' . $meetingURL
+                        'body' => 'Your Zoom meeting URL is: ' . $meetingURL
                     ]
                 ]);
 
-                return json_encode(['ZoomRequest' => $zoomResponse, 'JiraRequests' => $jiraResult]);
+                return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequests' => $jiraResult]);
 
             } else {
                 Log::error(strval($zoomResponse->getStatusCode()) . ' ' . $zoomResponse->getReasonPhrase(), [$zoomResponse->getBody()->getContents()]);
