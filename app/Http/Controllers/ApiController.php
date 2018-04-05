@@ -51,7 +51,7 @@ class ApiController extends Controller
                 ]
             ]);
 
-            $zoomResponse = $zoomClient->post('/v2/users/' . $zoomUserEmail . '/meetings', [
+            $zoomResponse = $zoomClient->post('/v2/users/' . urlencode($zoomUserEmail) . '/meetings', [
                 RequestOptions::JSON => [
                     'topic' => $topic,
                     'agenda' => $agenda,
