@@ -79,7 +79,7 @@ class ApiController extends Controller
                     ]
                 ]);
 
-                return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequests' => $jiraResult]);
+                return json_encode(['ZoomRequest' => $zoomResponse, 'JiraRequests' => $jiraResult]);
 
             } else {
                 Log::error(strval($zoomResponse->getStatusCode()) . ' ' . $zoomResponse->getReasonPhrase(), [$zoomResponse->getBody()->getContents()]);
