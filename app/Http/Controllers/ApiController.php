@@ -67,7 +67,6 @@ class ApiController extends Controller
                 $jiraClient = new Client([
                     'base_uri' => config('services.jira.api'),
                     'http_errors' => false,
-                    'verify' => false,
                     'auth' => [
                         config('services.jira.username'),
                         config('services.jira.password')
@@ -75,6 +74,7 @@ class ApiController extends Controller
                 ]);
 
                 $jiraResult = $jiraClient->put('/issue/' . $issueKey . '/comment/', [
+                    'verify' => false,
                     RequestOptions::JSON => [
                         'body' => 'Your Zoom meeting URL is: ' . $meetingURL
                     ]
