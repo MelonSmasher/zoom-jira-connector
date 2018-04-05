@@ -79,7 +79,7 @@ class ApiController extends Controller
                     ]
                 ]);
 
-                Log::debug('JiraResult', [$jiraResult]);
+                Log::debug('JiraResult ' . $jiraResult->getStatusCode(), [$jiraResult->getBody()->getContents()]);
 
                 return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequests' => $jiraResult]);
 
