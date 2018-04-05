@@ -24,7 +24,7 @@ class ApiController extends Controller
         $validator = Validator::make($data, [
             'api_key' => 'required',
             'issue_key' => 'required',
-            'zoom_user_email' => 'required|email',
+            'zoom_user_id' => 'required',
             'meeting_time' => 'required',
             'topic' => 'required',
             'agenda' => 'required'
@@ -40,7 +40,7 @@ class ApiController extends Controller
 
             $issueKey = $data['issue_key'];
             $meetingTimeZone = config('app.local_timezone');
-            $zoomUserEmail = $data['zoom_user_email'];
+            $zoomUserId = $data['zoom_user_id'];
             Log::debug('Input time: ' . $data['meeting_time']);
             $meetingTime = Carbon::createFromTimestamp($data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
             Log::debug('Formed meeting time: ' . $meetingTime);
@@ -55,7 +55,7 @@ class ApiController extends Controller
             ]);
 
             try {
-                $zoomResponse = $zoomClient->request('POST', '/users/' . $zoomUserEmail . '/meetings', [
+                $zoomResponse = $zoomClient->request('POST', '/users/' . $zoomUserId . '/meetings', [
                     'form_params' => [
                         'topic' => $topic,
                         'agenda' => $agenda,
