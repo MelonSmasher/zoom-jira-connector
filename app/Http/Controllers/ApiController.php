@@ -41,10 +41,9 @@ class ApiController extends Controller
             $issueKey = $data['issue_key'];
             $meetingTimeZone = config('app.local_timezone');
             $zoomUserEmail = $data['zoom_user_email'];
-
             Log::debug('Input time: ' . $data['meeting_time']);
-
             $meetingTime = Carbon::createFromTimestamp($data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
+            Log::debug('Formed meeting time: ' . $meetingTime);
             $topic = $data['topic'];
             $agenda = $data['agenda'];
 
@@ -66,6 +65,7 @@ class ApiController extends Controller
                     ]
                 ]);
             } catch (GuzzleException $exception) {
+                Log::error($exception->getMessage(), [$exception->getCode(), $exception->getTrace()]);
                 abort($exception->getCode(), $exception->getMessage());
             }
 
@@ -101,6 +101,7 @@ class ApiController extends Controller
                 return json_encode((object)['ZoomRequest' => $zoomResponse, 'JiraRequests' => [$result1, $result2]]);
 
             } else {
+                Log::error(strval($zoomResponse->getStatusCode()) . ' ' . $zoomResponse->getReasonPhrase(), [$zoomResponse->getBody()->getContents()]);
                 abort($zoomResponse->getStatusCode(), $zoomResponse->getBody()->getContents());
             }
         } else {
