@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -17,6 +18,8 @@ class ApiController extends Controller
     public function create(Request $request)
     {
         $data = $request->all();
+
+        Log::debug(json_encode($data));
 
         $validator = Validator::make($data, [
             'api_key' => 'required',
@@ -38,6 +41,9 @@ class ApiController extends Controller
             $issueKey = $data['issue_key'];
             $meetingTimeZone = config('app.local_timezone');
             $zoomUserEmail = $data['zoom_user_email'];
+
+            Log::debug('Input time: ' . $data['meeting_time']);
+
             $meetingTime = Carbon::createFromTimestamp($data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
             $topic = $data['topic'];
             $agenda = $data['agenda'];
