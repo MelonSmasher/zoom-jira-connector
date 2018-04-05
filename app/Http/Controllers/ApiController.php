@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class ApiController extends Controller
 {
 
-    protected $zoomBaseUrl = 'https://api.zoom.us/v2';
+    protected $zoomBaseUrl = 'https://api.zoom.us';
 
     public function create(Request $request)
     {
@@ -56,7 +56,7 @@ class ApiController extends Controller
             ]);
 
             try {
-                $zoomResponse = $zoomClient->request('POST', '/users/' . $zoomUserId . '/meetings', [
+                $zoomResponse = $zoomClient->request('POST', '/v2/users/' . $zoomUserId . '/meetings', [
                     'form_params' => [
                         'topic' => $topic,
                         'agenda' => $agenda,
