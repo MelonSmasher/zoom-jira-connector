@@ -42,7 +42,7 @@ class ApiController extends Controller
             $meetingTimeZone = config('app.local_timezone');
             $zoomUserId = $data['zoom_user_id'];
             Log::debug('Input time: ' . $data['meeting_time']);
-            $meetingTime = Carbon::createFromTimestamp($data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
+            $meetingTime = Carbon::createFromFormat('n/j/y g:i A',$data['meeting_time'], $meetingTimeZone)->format('Y-m-d\'T\'H:i:s');
             Log::debug('Formed meeting time: ' . $meetingTime);
             $topic = $data['topic'];
             $agenda = $data['agenda'];
